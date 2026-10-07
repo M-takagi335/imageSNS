@@ -51,7 +51,11 @@ async function fetchBatch() {
     prop: 'imageinfo', iiprop: 'url|size|mime',
     iiurlwidth: '600'
   });
-  const res = await fetch(`${API}?${params}`);
+  // 同じURLだとキャッシュされて毎回同じ「ランダム」結果が返るため、毎回URLを変える
+  params.set('maxage', '0');
+  params.set('smaxage', '0');
+  params.set('_', Date.now() + '-' + Math.random());
+  const res = await fetch(`${API}?${params}`, { cache: 'no-store' });
   if (!res.ok) throw new Error(res.status);
   const data = await res.json();
   const pages = Object.values((data.query && data.query.pages) || {});
